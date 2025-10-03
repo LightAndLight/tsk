@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:tsk"
+
+    - path: "./app/Main.hs"
+      component: "tsk:exe:tsk"
+
+    - path: "./test"
+      component: "tsk:test:tsk-tests"
