@@ -9,5 +9,8 @@ cradle:
     - path: "./app/Todoist.hs"
       component: "tsk:exe:tsk"
 
+    - path: "./app/BinaryFormat.hs"
+      component: "tsk:exe:tsk-binary-format"
+
     - path: "./test"
       component: "tsk:test:tsk-tests"
