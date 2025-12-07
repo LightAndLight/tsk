@@ -70,7 +70,7 @@ stateHeader = Ref def
         $ Body
         $ Cast (\((), ((), ((), ()))) -> ()) (\() -> Just ((), ((), ((), ()))))
           . Field (fromString "fileType") (literalUtf8 $ fromString "tsk;")
-          . Field (fromString "version") (literalUtf8 $ fromString "version=0;")
+          . Field (fromString "version") (literalUtf8 $ fromString "version=https://tsk.ielliott.io/v0;")
           . Field (fromString "endOfHeader") (literalUtf8 $ fromString "\n")
         $ Unit
 

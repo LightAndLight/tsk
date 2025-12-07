@@ -1,12 +1,167 @@
-<!doctype html>
 <html lang="en">
 
 <head>
 <meta charset="UTF-8">
-<title>tsk binary format v0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="main.css" rel="stylesheet">
+
+<title>tsk binary format version 0</title>
 </head>
 
 <body>
-version 0
+<header>
+<h1><a href="/">tsk</a></h1>
+</header>
+
+<main>
+<h2>tsk binary format version 0</h2>
+<pre>
+type State = {
+  header : StateHeader,
+  data : {
+    current : Set StateId,
+    tasks : Map TaskId Task,
+    taskMetadata : Map TaskId TaskMetadata,
+    comments : Map CommentId Comment,
+    commentMetadata : Map CommentId CommentMetadata,
+    history : Map StateId Commit
+  }
+}
+
+type StateHeader = {
+  fileType : &quot;tsk;&quot;,
+  version : &quot;version=https://tsk.ielliott.io/v0;&quot;,
+  endOfHeader : &quot;\n&quot;
+}
+
+# The `List` is sorted in ascending order.
+type Set a = List a
+
+type List a = {
+  len : Word64,
+  items : Vector len a
+}
+
+type Word64 is &quot;an 8 byte natural number (big endian)&quot;
+
+type Vector len a is &quot;`len` consecutive `a`s&quot;
+
+type StateId = MD5
+
+type MD5 = {
+  0 : Word64,
+  1 : Word64
+}
+
+# The `List` is sorted in ascending order on the first element of the pair
+type Map k v = List (Pair k v)
+
+type Pair a b = {
+  fst : a,
+  snd : b
+}
+
+type TaskId = GID
+
+type GID = {
+  0 : Word16,
+  1 : Word16,
+  2 : Word16,
+  3 : Word16,
+  4 : Word16
+}
+
+type Word16 is &quot;a 2 byte natural number (big endian)&quot;
+
+type Task = {
+  status : Map StateId Utf8,
+  labels : Map StateId (Set Utf8),
+  title : Map StateId Utf8,
+  description : Map StateId Utf8
+}
+
+type Utf8 = {
+  length : Word64,
+  bytes : Vector length Word8
+}
+
+type Word8 is &quot;a byte (big endian)&quot;
+
+type TaskMetadata = {
+  createdAt : UTCTime
+}
+
+# Milliseconds since 1970-01-01T00:00Z
+type UTCTime = Word64
+
+type CommentId = GID
+
+type Comment = {
+  description : Map StateId Utf8
+}
+
+type CommentMetadata = {
+  createdAt : UTCTime,
+  replyTo : ReplyId
+}
+
+type ReplyId = {
+  tag : Word64,
+  value : match tag {
+    0 -&gt; TaskId,
+    1 -&gt; CommentId
+  }
+}
+
+type Commit = {
+  parents : Set StateId,
+  change : Change
+}
+
+type Change = {
+  tag : Word64,
+  value : match tag {
+    0 -&gt; {
+      status : Utf8,
+      labels : Set Utf8,
+      title : Utf8,
+      description : Utf8
+    },
+    1 -&gt; {
+      taskId : TaskId,
+      updateTask : {
+        status : Update Utf8,
+        labels : Update (Set Utf8),
+        title : Update Utf8,
+        description : Update Utf8
+      }
+    },
+    2 -&gt; {
+      replyTo : ReplyId,
+      comment : {
+        description : Utf8
+      }
+    },
+    3 -&gt; {
+      commentId : CommentId,
+      updateComment : {
+        description : Update Utf8
+      }
+    }
+  }
+}
+
+type Update a = {
+  tag : Word64,
+  value : match tag {
+    0 -&gt; {},
+    1 -&gt; a,
+    2 -&gt; StateId
+  }
+}
+
+</pre>
+</main>
 </body>
 </html>
+

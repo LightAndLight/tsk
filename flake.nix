@@ -17,6 +17,8 @@
             haskellPackages.fourmolu
             haskellPackages.implicit-hie
             fd
+
+            haskellPackages.mustache
           ];
         };
       }

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="main.css" rel="stylesheet">
+
+<title>tsk binary format overview</title>
+</head>
+
+<body>
+<header>
+<h1><a href="/">tsk</a></h1>
+</header>
+
+<main>
+<h2>Binary format overview</h2>
+<p>Documentation for the tsk binary formats is generated directly from the code that defines the encoder/decoder, so that the documentation stays in sync.
+
+<h3>Binary format description grammar</h3>
+<pre>
+&lt;primitive-definition&gt; ::= 'primitive' &lt;type-name&gt; &lt;name&gt; 'is' &lt;primitive-description&gt;
+&lt;primitive-description&gt; ::= &lt;string&gt;
+
+&lt;type-definition&gt; ::= 'type' &lt;type-name&gt; &lt;name&gt* '=' &lt;type&gt;
+
+&lt;type-name&gt; ::= [A-Z] [A-Za-z0-9]*
+&lt;name&gt; ::= [a-z] [A-Za-z0-9]*
+
+&lt;type&gt; ::= &lt;type-application&gt; | &lt;type-match&gt;
+&lt;type-application&gt; ::= &lt;type-atom&gt; &lt;type-atom&gt;*
+&lt;type-atom&gt; ::= &lt;type-record&gt; | &lt;type-literal&gt; | '(' &lt;type&gt; ')
+
+&lt;type-record&gt; ::= '{' (&lt;type-record-item&gt; (',' &lt;type-record-item&gt;)*)? '}'
+&lt;type-record-item&gt; ::= &lt;name&gt; ':' &lt;type&gt;
+
+&lt;type-literal&gt; ::= &lt;int&gt | &lt;string&gt;
+&lt;int&gt; ::= '-'? [0-9]+
+&lt;string&gt; ::= '"' ([^"] | '\' '"')* '"'
+
+&lt;type-match&gt; ::= 'match' &lt;type&gt; '{' (&lt;type-match-item&gt; (',' &lt;type-match-item&gt;)*)? '}'
+&lt;type-match-item&gt; ::= &lt;type-match-pattern&gt; '=&gt;' &lt;type&gt;
+&lt;type-match-pattern&gt; ::= &lt;type-literal&gt;
+</pre>
+</main>
+</body>
+</html>
