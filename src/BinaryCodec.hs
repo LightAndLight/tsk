@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -380,12 +381,23 @@ data DocumentedBody
   deriving (Show)
 
 data DocumentedType
-  = DocumentedName !Text
+  = DocumentedName !NameType !Text
   | DocumentedString !Text
   | DocumentedStruct ![(Text, DocumentedType)]
   | DocumentedApp DocumentedType DocumentedType
   | DocumentedChoice DocumentedType [(DocumentedLit, DocumentedType)]
   deriving (Show)
+
+data NameType
+  = NamePrim
+  | NameDef
+  | NameLocal
+  deriving (Show)
+
+nameType :: Body ctx a -> NameType
+nameType (Param _ a) = nameType a
+nameType Prim{} = NamePrim
+nameType Body{} = NameDef
 
 newtype DocumentedLit
   = DocumentedLit Text
@@ -394,7 +406,7 @@ newtype DocumentedLit
 data DocumentedState
   = DocumentedState
       -- | Definitions
-      !(Map Text (Placeholder Documented))
+      !(Map Text (NameType, Placeholder Documented))
       -- | Order
       !(DList Text)
 
@@ -410,7 +422,7 @@ runDocumented :: State DocumentedState a -> ([Documented], a)
 runDocumented ma =
   let
     (a, DocumentedState defs order) = runState ma (DocumentedState mempty mempty)
-    defs' = mapMaybe (placeholderToMaybe <=< (`Map.lookup` defs)) (DList.toList order)
+    defs' = mapMaybe (placeholderToMaybe . snd <=< (`Map.lookup` defs)) (DList.toList order)
   in
     (defs', a)
 
@@ -418,14 +430,16 @@ documentedDef ::
   MonadState DocumentedState m => Def a -> m DocumentedType
 documentedDef (Def name desc body) = do
   mDef <- gets $ \(DocumentedState defs _) -> Map.lookup name defs
-  case mDef of
-    Just{} -> pure ()
+  ty <- case mDef of
+    Just (ty, _) -> pure ty
     Nothing -> do
-      modify $ \(DocumentedState defs order) -> DocumentedState (Map.insert name Missing defs) (order `DList.snoc` name)
+      let !ty = nameType body
+      modify $ \(DocumentedState defs order) -> DocumentedState (Map.insert name (ty, Missing) defs) (order `DList.snoc` name)
       (params, body') <- documentedBody body HNil
       let doc = Documented (if Text.null desc then Nothing else Just desc) name params body'
-      modify $ \(DocumentedState defs order) -> DocumentedState (Map.insert name (Present doc) defs) order
-  pure $ DocumentedName name
+      modify $ \(DocumentedState defs order) -> DocumentedState (Map.insert name (ty, Present doc) defs) order
+      pure ty
+  pure $ DocumentedName ty name
 
 documentedBody ::
   MonadState DocumentedState m =>
@@ -444,7 +458,7 @@ documentedType ::
   HList (Const Text) ctx ->
   m DocumentedType
 documentedType (Ref d) _ctx = documentedDef d
-documentedType (Var ix) ctx = pure $ DocumentedName (getConst $ index ctx ix)
+documentedType (Var ix) ctx = pure $ DocumentedName NameLocal (getConst $ index ctx ix)
 documentedType (LiteralUtf8 expected) _ctx = pure $ DocumentedString expected
 documentedType (App f x) ctx = DocumentedApp <$> documentedType f ctx <*> documentedType x ctx
 documentedType b@Field{} ctx = DocumentedStruct <$> documentedStruct b ctx
@@ -453,7 +467,7 @@ documentedType (Choice x ys) ctx =
     <$> documentedType x ctx
     <*> traverse (bitraverse documentedLit (`documentedType` ctx)) ys
 documentedType (Cast _to _from rest) ctx = documentedType rest ctx
-documentedType Unit _ctx = pure $ DocumentedName (fromString "{}")
+documentedType Unit _ctx = pure $ DocumentedName NameLocal (fromString "{}")
 
 documentedLit :: (IsLit a, Applicative m) => a -> m DocumentedLit
 documentedLit a = pure . DocumentedLit $ renderLit a
@@ -479,17 +493,33 @@ docDocumented (Documented mDesc name params body) =
             DocumentedPrim{} -> fromString "primitive"
         )
           <> fromString " "
+          <> fromString "<a id=\""
+          <> defId
+          <> fromString "\" href=\"#"
+          <> defId
+          <> fromString "\">"
           <> name
+          <> fromString "</a>"
           <> foldMap (fromString " " <>) params
       )
       `Pretty.extend` docDocumentedBody body
+  where
+    defId =
+      case body of
+        DocumentedType{} -> fromString "type-" <> name
+        DocumentedPrim{} -> fromString "prim-" <> name
 
 docDocumentedBody :: DocumentedBody -> Pretty.Doc
 docDocumentedBody (DocumentedPrim desc) = Pretty.line $ " is \"" ++ Text.unpack desc ++ "\""
 docDocumentedBody (DocumentedType ty) = Pretty.line " = " `Pretty.extend` docDocumentedType ty
 
 docDocumentedType :: DocumentedType -> Pretty.Doc
-docDocumentedType (DocumentedName n) = Pretty.line $ Text.unpack n
+docDocumentedType (DocumentedName ty n) =
+  Pretty.line $
+    case ty of
+      NamePrim -> "<a href=\"#prim-" <> Text.unpack n <> "\">" <> Text.unpack n <> "</a>"
+      NameDef -> "<a href=\"#type-" <> Text.unpack n <> "\">" <> Text.unpack n <> "</a>"
+      NameLocal -> Text.unpack n
 docDocumentedType (DocumentedString s) =
   Pretty.line $ "\"" ++ concatMap escape (Text.unpack s) ++ "\""
   where

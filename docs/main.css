@@ -1,8 +1,10 @@
 :root {
   --primary: #efb679;
-  --primary-light: #fcd6a6;
   --primary-medium: #cd9251;
-  --primary-dark: #aa670d;
+  --primary-text: #a76405;
+
+  --primary-highlight: #f3d5aa;
+  --primary-highlight-text: #975a08;
 }
 
 * {
@@ -44,7 +46,8 @@ main {
 }
 
 *:target {
-  background-color: var(--primary-light);
+  background-color: var(--primary-highlight);
+  color: var(--primary-highlight-text);
 }
 
 h3:target, h4:target, h5:target, h6:target {
@@ -56,7 +59,7 @@ h3:target, h4:target, h5:target, h6:target {
 }
 
 a {
-  color: var(--primary-dark);
+  color: var(--primary-text);
   text-underline-offset: 0.15em;
 }
 
@@ -108,7 +111,7 @@ h4, h5, h6 {
 }
 
 .list-header + ul > li a:hover {
-  color: var(--primary-dark);
+  color: var(--primary-text);
 }
 
 a.help {

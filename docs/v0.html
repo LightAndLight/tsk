@@ -16,147 +16,147 @@
 <main>
 <h2>tsk binary format version 0</h2>
 <pre>
-type State = {
-  header : StateHeader,
+type <a id="type-State" href="#type-State">State</a> = {
+  header : <a href="#type-StateHeader">StateHeader</a>,
   data : {
-    current : Set StateId,
-    tasks : Map TaskId Task,
-    taskMetadata : Map TaskId TaskMetadata,
-    comments : Map CommentId Comment,
-    commentMetadata : Map CommentId CommentMetadata,
-    history : Map StateId Commit
+    current : <a href="#type-Set">Set</a> <a href="#type-StateId">StateId</a>,
+    tasks : <a href="#type-Map">Map</a> <a href="#type-TaskId">TaskId</a> <a href="#type-Task">Task</a>,
+    taskMetadata : <a href="#type-Map">Map</a> <a href="#type-TaskId">TaskId</a> <a href="#type-TaskMetadata">TaskMetadata</a>,
+    comments : <a href="#type-Map">Map</a> <a href="#type-CommentId">CommentId</a> <a href="#type-Comment">Comment</a>,
+    commentMetadata : <a href="#type-Map">Map</a> <a href="#type-CommentId">CommentId</a> <a href="#type-CommentMetadata">CommentMetadata</a>,
+    history : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Commit">Commit</a>
   }
 }
 
-type StateHeader = {
-  fileType : &quot;tsk;&quot;,
-  version : &quot;version=https://tsk.ielliott.io/v0;&quot;,
-  endOfHeader : &quot;\n&quot;
+type <a id="type-StateHeader" href="#type-StateHeader">StateHeader</a> = {
+  fileType : "tsk;",
+  version : "version=https://tsk.ielliott.io/v0;",
+  endOfHeader : "\n"
 }
 
 # The `List` is sorted in ascending order.
-type Set a = List a
+type <a id="type-Set" href="#type-Set">Set</a> a = <a href="#type-List">List</a> a
 
-type List a = {
-  len : Word64,
-  items : Vector len a
+type <a id="type-List" href="#type-List">List</a> a = {
+  len : <a href="#prim-Word64">Word64</a>,
+  items : <a href="#prim-Vector">Vector</a> len a
 }
 
-primitive Word64 is &quot;an 8 byte natural number (big endian)&quot;
+primitive <a id="prim-Word64" href="#prim-Word64">Word64</a> is "an 8 byte natural number (big endian)"
 
-primitive Vector len a is &quot;`len` consecutive `a`s&quot;
+primitive <a id="prim-Vector" href="#prim-Vector">Vector</a> len a is "`len` consecutive `a`s"
 
-type StateId = MD5
+type <a id="type-StateId" href="#type-StateId">StateId</a> = <a href="#type-MD5">MD5</a>
 
-type MD5 = {
-  0 : Word64,
-  1 : Word64
+type <a id="type-MD5" href="#type-MD5">MD5</a> = {
+  0 : <a href="#prim-Word64">Word64</a>,
+  1 : <a href="#prim-Word64">Word64</a>
 }
 
 # The `List` is sorted in ascending order on the first element of the pair
-type Map k v = List (Pair k v)
+type <a id="type-Map" href="#type-Map">Map</a> k v = <a href="#type-List">List</a> (<a href="#type-Pair">Pair</a> k v)
 
-type Pair a b = {
+type <a id="type-Pair" href="#type-Pair">Pair</a> a b = {
   fst : a,
   snd : b
 }
 
-type TaskId = GID
+type <a id="type-TaskId" href="#type-TaskId">TaskId</a> = <a href="#type-GID">GID</a>
 
-type GID = {
-  0 : Word16,
-  1 : Word16,
-  2 : Word16,
-  3 : Word16,
-  4 : Word16
+type <a id="type-GID" href="#type-GID">GID</a> = {
+  0 : <a href="#prim-Word16">Word16</a>,
+  1 : <a href="#prim-Word16">Word16</a>,
+  2 : <a href="#prim-Word16">Word16</a>,
+  3 : <a href="#prim-Word16">Word16</a>,
+  4 : <a href="#prim-Word16">Word16</a>
 }
 
-primitive Word16 is &quot;a 2 byte natural number (big endian)&quot;
+primitive <a id="prim-Word16" href="#prim-Word16">Word16</a> is "a 2 byte natural number (big endian)"
 
-type Task = {
-  status : Map StateId Utf8,
-  labels : Map StateId (Set Utf8),
-  title : Map StateId Utf8,
-  description : Map StateId Utf8
+type <a id="type-Task" href="#type-Task">Task</a> = {
+  status : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Utf8">Utf8</a>,
+  labels : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> (<a href="#type-Set">Set</a> <a href="#type-Utf8">Utf8</a>),
+  title : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Utf8">Utf8</a>,
+  description : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Utf8">Utf8</a>
 }
 
-type Utf8 = {
-  length : Word64,
-  bytes : Vector length Word8
+type <a id="type-Utf8" href="#type-Utf8">Utf8</a> = {
+  length : <a href="#prim-Word64">Word64</a>,
+  bytes : <a href="#prim-Vector">Vector</a> length <a href="#prim-Word8">Word8</a>
 }
 
-primitive Word8 is &quot;a byte (big endian)&quot;
+primitive <a id="prim-Word8" href="#prim-Word8">Word8</a> is "a byte (big endian)"
 
-type TaskMetadata = {
-  createdAt : UTCTime
+type <a id="type-TaskMetadata" href="#type-TaskMetadata">TaskMetadata</a> = {
+  createdAt : <a href="#type-UTCTime">UTCTime</a>
 }
 
 # Milliseconds since 1970-01-01T00:00Z
-type UTCTime = Word64
+type <a id="type-UTCTime" href="#type-UTCTime">UTCTime</a> = <a href="#prim-Word64">Word64</a>
 
-type CommentId = GID
+type <a id="type-CommentId" href="#type-CommentId">CommentId</a> = <a href="#type-GID">GID</a>
 
-type Comment = {
-  description : Map StateId Utf8
+type <a id="type-Comment" href="#type-Comment">Comment</a> = {
+  description : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Utf8">Utf8</a>
 }
 
-type CommentMetadata = {
-  createdAt : UTCTime,
-  replyTo : ReplyId
+type <a id="type-CommentMetadata" href="#type-CommentMetadata">CommentMetadata</a> = {
+  createdAt : <a href="#type-UTCTime">UTCTime</a>,
+  replyTo : <a href="#type-ReplyId">ReplyId</a>
 }
 
-type ReplyId = {
-  tag : Word64,
+type <a id="type-ReplyId" href="#type-ReplyId">ReplyId</a> = {
+  tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -&gt; TaskId,
-    1 -&gt; CommentId
+    0 -> <a href="#type-TaskId">TaskId</a>,
+    1 -> <a href="#type-CommentId">CommentId</a>
   }
 }
 
-type Commit = {
-  parents : Set StateId,
-  change : Change
+type <a id="type-Commit" href="#type-Commit">Commit</a> = {
+  parents : <a href="#type-Set">Set</a> <a href="#type-StateId">StateId</a>,
+  change : <a href="#type-Change">Change</a>
 }
 
-type Change = {
-  tag : Word64,
+type <a id="type-Change" href="#type-Change">Change</a> = {
+  tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -&gt; {
-      status : Utf8,
-      labels : Set Utf8,
-      title : Utf8,
-      description : Utf8
+    0 -> {
+      status : <a href="#type-Utf8">Utf8</a>,
+      labels : <a href="#type-Set">Set</a> <a href="#type-Utf8">Utf8</a>,
+      title : <a href="#type-Utf8">Utf8</a>,
+      description : <a href="#type-Utf8">Utf8</a>
     },
-    1 -&gt; {
-      taskId : TaskId,
+    1 -> {
+      taskId : <a href="#type-TaskId">TaskId</a>,
       updateTask : {
-        status : Update Utf8,
-        labels : Update (Set Utf8),
-        title : Update Utf8,
-        description : Update Utf8
+        status : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>,
+        labels : <a href="#type-Update">Update</a> (<a href="#type-Set">Set</a> <a href="#type-Utf8">Utf8</a>),
+        title : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>,
+        description : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>
       }
     },
-    2 -&gt; {
-      replyTo : ReplyId,
+    2 -> {
+      replyTo : <a href="#type-ReplyId">ReplyId</a>,
       comment : {
-        description : Utf8
+        description : <a href="#type-Utf8">Utf8</a>
       }
     },
-    3 -&gt; {
-      commentId : CommentId,
+    3 -> {
+      commentId : <a href="#type-CommentId">CommentId</a>,
       updateComment : {
-        description : Update Utf8
+        description : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>
       }
     }
   }
 }
 
-type Update a = {
-  tag : Word64,
+type <a id="type-Update" href="#type-Update">Update</a> a = {
+  tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -&gt; {},
-    1 -&gt; a,
-    2 -&gt; StateId
+    0 -> {},
+    1 -> a,
+    2 -> <a href="#type-StateId">StateId</a>
   }
 }
 
