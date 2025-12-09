@@ -42,9 +42,9 @@ type List a = {
   items : Vector len a
 }
 
-type Word64 is &quot;an 8 byte natural number (big endian)&quot;
+primitive Word64 is &quot;an 8 byte natural number (big endian)&quot;
 
-type Vector len a is &quot;`len` consecutive `a`s&quot;
+primitive Vector len a is &quot;`len` consecutive `a`s&quot;
 
 type StateId = MD5
 
@@ -71,7 +71,7 @@ type GID = {
   4 : Word16
 }
 
-type Word16 is &quot;a 2 byte natural number (big endian)&quot;
+primitive Word16 is &quot;a 2 byte natural number (big endian)&quot;
 
 type Task = {
   status : Map StateId Utf8,
@@ -85,7 +85,7 @@ type Utf8 = {
   bytes : Vector length Word8
 }
 
-type Word8 is &quot;a byte (big endian)&quot;
+primitive Word8 is &quot;a byte (big endian)&quot;
 
 type TaskMetadata = {
   createdAt : UTCTime

@@ -1,32 +1,32 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE NoFieldSelectors #-}
-{-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE NoFieldSelectors #-}
 
 module Main where
 
 import BinaryCodec (Def, Ty (..), docDocumented, documentedDef, runDocumented)
 import Control.Applicative ((<**>))
+import Control.Monad.Fix (MonadFix)
+import Control.Monad.Writer (Writer, runWriter, tell)
 import Data.Foldable (for_, toList)
+import Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.String (fromString)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text
+import Data.Text.Lazy (LazyText)
+import qualified Data.Text.Lazy as LazyText
 import qualified Data.Text.Lazy.IO as LazyText
+import GHC.IsList (fromList)
 import qualified Options.Applicative as Options
 import qualified Pretty
 import System.IO (hPutStrLn, stderr)
 import qualified Todo.V0
-import Data.List.NonEmpty (NonEmpty (..))
-import GHC.IsList (fromList)
 import Prelude hiding (break)
-import Control.Monad.Fix (MonadFix)
-import Control.Monad.Writer (Writer, runWriter, tell)
-import qualified Data.List.NonEmpty as NonEmpty
-import Data.Text.Lazy (LazyText)
-import qualified Data.Text.Lazy as LazyText
 
 data Cli
   = CliVersion {version :: Text}
@@ -157,11 +157,12 @@ grammar =
     typeAtom <-
       define
         "type-atom"
-        [ Or $ fromList
-            [ ref typeRecord
-            , ref typeLiteral
-            , Sequence $ fromList [lit "(", ref type_, lit ")"]
-            ]
+        [ Or $
+            fromList
+              [ ref typeRecord
+              , ref typeLiteral
+              , Sequence $ fromList [lit "(", ref type_, lit ")"]
+              ]
         ]
 
     break
@@ -180,7 +181,9 @@ grammar =
     typeRecordItem <-
       define
         "type-record-item"
-        [ ref name, lit ":", ref type_
+        [ ref name
+        , lit ":"
+        , ref type_
         ]
 
     break
@@ -215,10 +218,10 @@ grammar =
         , ref type_
         , lit "{"
         , Optional . Sequence $
-          fromList
-            [ ref typeMatchItem
-            , Many . Sequence $ fromList [lit ",", ref typeMatchItem]
-            ]
+            fromList
+              [ ref typeMatchItem
+              , Many . Sequence $ fromList [lit ",", ref typeMatchItem]
+              ]
         , lit "}"
         ]
     typeMatchItem <-
@@ -231,19 +234,23 @@ grammar =
     typeMatchPattern <-
       define
         "type-match-pattern"
-        [ ref typeLiteral ]
+        [ref typeLiteral]
 
     pure ()
 
 renderProduction :: Production -> LazyText
 renderProduction Break = fromString "\n"
 renderProduction (Production name values) =
-  fromString "<a id=\"grammar-" <> LazyText.fromStrict name <>
-  fromString "\" href=\"#grammar-" <> LazyText.fromStrict name <> fromString "\">" <>
-  LazyText.fromStrict name <>
-  fromString "</a>" <>
-  fromString " ::= " <>
-  foldMap renderProductionValue values <> fromString "\n"
+  fromString "<a id=\"grammar-"
+    <> LazyText.fromStrict name
+    <> fromString "\" href=\"#grammar-"
+    <> LazyText.fromStrict name
+    <> fromString "\">"
+    <> LazyText.fromStrict name
+    <> fromString "</a>"
+    <> fromString " ::= "
+    <> foldMap renderProductionValue values
+    <> fromString "\n"
   where
     renderClass (a, b)
       | a == b = fromString [a]
@@ -255,9 +262,13 @@ renderProduction (Production name values) =
     renderProductionValue value =
       case value of
         Name n ->
-          fromString "<a href=\"#grammar-" <> LazyText.fromStrict n <> fromString "\">" <>
-          fromString "&lt;" <> LazyText.fromStrict n <> fromString "&gt;" <>
-          fromString "</a>"
+          fromString "<a href=\"#grammar-"
+            <> LazyText.fromStrict n
+            <> fromString "\">"
+            <> fromString "&lt;"
+            <> LazyText.fromStrict n
+            <> fromString "&gt;"
+            <> fromString "</a>"
         Literal l ->
           fromString "'" <> LazyText.fromStrict l <> fromString "'"
         Or values' ->
@@ -301,7 +312,7 @@ main = do
         Nothing -> do
           hPutStrLn stderr $ "error: unknown version " ++ show cli.version
           hPutStrLn stderr "available versions:"
-          for_ versions $  Text.hPutStrLn stderr . fst
+          for_ versions $ Text.hPutStrLn stderr . fst
         Just (SomeCodec codec) -> do
           let (defs, _ty) = runDocumented $ documentedDef codec
           for_ defs $ LazyText.putStrLn . Pretty.render . docDocumented

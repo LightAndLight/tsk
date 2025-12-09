@@ -473,7 +473,15 @@ documentedStruct _ _ctx = error "Not Field or Unit"
 docDocumented :: Documented -> Pretty.Doc
 docDocumented (Documented mDesc name params body) =
   foldMap (\desc -> Pretty.line $ fromString "# " <> desc) mDesc
-    <> Pretty.line (fromString "type " <> name <> foldMap (fromString " " <>) params)
+    <> Pretty.line
+      ( ( case body of
+            DocumentedType{} -> fromString "type"
+            DocumentedPrim{} -> fromString "primitive"
+        )
+          <> fromString " "
+          <> name
+          <> foldMap (fromString " " <>) params
+      )
       `Pretty.extend` docDocumentedBody body
 
 docDocumentedBody :: DocumentedBody -> Pretty.Doc
