@@ -15,34 +15,45 @@
 </header>
 
 <main>
+<div id="toc">
+<h2>Contents</h2>
+<ul>
+<li><a href="#description-language-grammar">Description language grammar</a>
+</ul>
+</div>
+
 <h2>Binary format overview</h2>
-<p>Documentation for the tsk binary formats is generated directly from the code that defines the encoder/decoder, so that the documentation stays in sync.
+<p>Documentation for the tsk binary formats is generated directly from the code that defines the encoder/decoder, so that the documentation stays in sync.</p>
+<p>The binary formats are documented using a description language, which is informally explained here.
+The intent is to provide enough information for third parties to implement their own encoders and decoders.</p>
 
-<h3>Binary format description grammar</h3>
+<h3 id="description-language-grammar"><a href="#description-language-grammar">Description language grammar</a></h3>
 <pre>
-&lt;primitive-definition&gt; ::= 'primitive' &lt;type-name&gt; &lt;name&gt; 'is' &lt;primitive-description&gt;
-&lt;primitive-description&gt; ::= &lt;string&gt;
+<a id="grammar-primitive-definition" href="#grammar-primitive-definition">primitive-definition</a> ::= 'primitive' <a href="#grammar-type-name">&lt;type-name&gt;</a> <a href="#grammar-name">&lt;name&gt;</a>* 'is' <a href="#grammar-string">&lt;string&gt;</a>
 
-&lt;type-definition&gt; ::= 'type' &lt;type-name&gt; &lt;name&gt* '=' &lt;type&gt;
+<a id="grammar-type-definition" href="#grammar-type-definition">type-definition</a> ::= 'type' <a href="#grammar-type-name">&lt;type-name&gt;</a> <a href="#grammar-name">&lt;name&gt;</a>* '=' <a href="#grammar-type">&lt;type&gt;</a>
 
-&lt;type-name&gt; ::= [A-Z] [A-Za-z0-9]*
-&lt;name&gt; ::= [a-z] [A-Za-z0-9]*
+<a id="grammar-type-name" href="#grammar-type-name">type-name</a> ::= [A-Z] [A-Za-z0-9]*
+<a id="grammar-name" href="#grammar-name">name</a> ::= [a-z] [A-Za-z0-9]*
 
-&lt;type&gt; ::= &lt;type-application&gt; | &lt;type-match&gt;
-&lt;type-application&gt; ::= &lt;type-atom&gt; &lt;type-atom&gt;*
-&lt;type-atom&gt; ::= &lt;type-record&gt; | &lt;type-literal&gt; | '(' &lt;type&gt; ')
+<a id="grammar-type" href="#grammar-type">type</a> ::= <a href="#grammar-type-application">&lt;type-application&gt;</a> | <a href="#grammar-type-match">&lt;type-match&gt;</a>
+<a id="grammar-type-application" href="#grammar-type-application">type-application</a> ::= <a href="#grammar-type-atom">&lt;type-atom&gt;</a> <a href="#grammar-type-atom">&lt;type-atom&gt;</a>*
+<a id="grammar-type-atom" href="#grammar-type-atom">type-atom</a> ::= <a href="#grammar-type-record">&lt;type-record&gt;</a> | <a href="#grammar-type-literal">&lt;type-literal&gt;</a> | '(' <a href="#grammar-type">&lt;type&gt;</a> ')'
 
-&lt;type-record&gt; ::= '{' (&lt;type-record-item&gt; (',' &lt;type-record-item&gt;)*)? '}'
-&lt;type-record-item&gt; ::= &lt;name&gt; ':' &lt;type&gt;
+<a id="grammar-type-record" href="#grammar-type-record">type-record</a> ::= '{' (<a href="#grammar-type-record-item">&lt;type-record-item&gt;</a> (',' <a href="#grammar-type-record-item">&lt;type-record-item&gt;</a>)*)? '}'
+<a id="grammar-type-record-item" href="#grammar-type-record-item">type-record-item</a> ::= <a href="#grammar-name">&lt;name&gt;</a> ':' <a href="#grammar-type">&lt;type&gt;</a>
 
-&lt;type-literal&gt; ::= &lt;int&gt | &lt;string&gt;
-&lt;int&gt; ::= '-'? [0-9]+
-&lt;string&gt; ::= '"' ([^"] | '\' '"')* '"'
+<a id="grammar-type-literal" href="#grammar-type-literal">type-literal</a> ::= <a href="#grammar-int">&lt;int&gt;</a> | <a href="#grammar-string">&lt;string&gt;</a>
+<a id="grammar-int" href="#grammar-int">int</a> ::= '-'? [0-9]+
+<a id="grammar-string" href="#grammar-string">string</a> ::= '"' ([^"] | '\' '"')* '"'
 
-&lt;type-match&gt; ::= 'match' &lt;type&gt; '{' (&lt;type-match-item&gt; (',' &lt;type-match-item&gt;)*)? '}'
-&lt;type-match-item&gt; ::= &lt;type-match-pattern&gt; '=&gt;' &lt;type&gt;
-&lt;type-match-pattern&gt; ::= &lt;type-literal&gt;
+<a id="grammar-type-match" href="#grammar-type-match">type-match</a> ::= 'match' <a href="#grammar-type">&lt;type&gt;</a> '{' (<a href="#grammar-type-match-item">&lt;type-match-item&gt;</a> (',' <a href="#grammar-type-match-item">&lt;type-match-item&gt;</a>)*)? '}'
+<a id="grammar-type-match-item" href="#grammar-type-match-item">type-match-item</a> ::= <a href="#grammar-type-match-pattern">&lt;type-match-pattern&gt;</a> '=>' <a href="#grammar-type">&lt;type&gt;</a>
+<a id="grammar-type-match-pattern" href="#grammar-type-match-pattern">type-match-pattern</a> ::= <a href="#grammar-type-literal">&lt;type-literal&gt;</a>
+
+
 </pre>
 </main>
 </body>
 </html>
+
