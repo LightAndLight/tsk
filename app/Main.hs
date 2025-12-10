@@ -461,6 +461,8 @@ taskNew path = do
 
   let taskFile = "drafts/" ++ formatTime defaultTimeLocale formatYMDHMS now ++ ".txt"
   let taskFileBase = taskFile ++ ".base"
+
+  createDirectoryIfMissing True "drafts"
   writeFile taskFileBase taskFileTemplate
   copyFile taskFileBase taskFile
 
