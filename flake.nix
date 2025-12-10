@@ -1,12 +1,35 @@
 {
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
+    hdeps = {
+      url = "github:LightAndLight/hdeps";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, hdeps }:
     flake-utils.lib.eachDefaultSystem (system:
       let 
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            (self: super: {
+              haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
+            })
+          ];
+        };
+
+        packages = {
+          default = pkgs.haskellPackages.callPackage ./tsk.nix {};
+        };
+
+        apps = {
+          type = "app";
+          program = "${packages.default}/bin/tsk";
+          meta.description = "A to-do list / task-tracking program";
+        };
       in {
+        inherit apps packages;
+
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             haskellPackages.ghc
@@ -17,9 +40,15 @@
             haskellPackages.fourmolu
             haskellPackages.implicit-hie
             fd
+            cabal2nix
+            hdeps.packages.${system}.default
 
             haskellPackages.mustache
           ];
+
+          shellHook = ''
+            export PROJECT_ROOT=$(git rev-parse --show-toplevel)
+          '';
         };
       }
     );

@@ -11,3 +11,6 @@ gen-docs:
         docs-templates/binary-format.html \
         <(jq -sR '{grammar: .}' <(cabal run tsk-binary-format -- grammar)) \
         > docs/binary-format.html
+
+cabal2nix:
+    cabal2nix . > tsk.nix

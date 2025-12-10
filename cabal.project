@@ -1,3 +1,12 @@
 packages: .
 
 tests: True
+
+--- BEGIN HDEPS ---
+
+source-repository-package
+  type: git
+  location: https://github.com/soenkehahn/generics-eot/archive/351f0c2e8d4586d294f803e906c06b8dcc7a0a14.tar.gz
+  tag: 351f0c2e8d4586d294f803e906c06b8dcc7a0a14
+
+--- END HDEPS ---

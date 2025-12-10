@@ -18,7 +18,42 @@
         "type": "github"
       }
     },
+    "hdeps": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1764304207,
+        "narHash": "sha256-/E14AzlV5RfkVR3nTqFKue6v3gnzCkdfFKgeuymwkKA=",
+        "owner": "LightAndLight",
+        "repo": "hdeps",
+        "rev": "8f56ec5c7e865ee0b91ce972e87a22193df59ade",
+        "type": "github"
+      },
+      "original": {
+        "owner": "LightAndLight",
+        "repo": "hdeps",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1756159630,
+        "narHash": "sha256-ohMvsjtSVdT/bruXf5ClBh8ZYXRmD4krmjKrXhEvwMg=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "84c256e42600cb0fdf25763b48d28df2f25a0c8b",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1756159630,
         "narHash": "sha256-ohMvsjtSVdT/bruXf5ClBh8ZYXRmD4krmjKrXhEvwMg=",
@@ -35,7 +70,8 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "hdeps": "hdeps",
+        "nixpkgs": "nixpkgs_2"
       }
     },
     "systems": {
