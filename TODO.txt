@@ -1,5 +1,25 @@
 * [ ] Update a task and leave a comment in a single "transaction"
 
+* [ ] Add branch comment to `match` expressions in binary format
+
+  e.g.
+
+  ```
+  type Update a = {
+    tag : Word64,
+    value : match tag {
+      # No change
+      0 => {},
+
+      # Changed
+      1 => a,
+
+      # Picked from a set of conflicts
+      2 => StateId
+    }
+  }
+  ```
+
 * [x] Document binary format
 
 * [x] `task new` without editing the file shouldn't create a task
