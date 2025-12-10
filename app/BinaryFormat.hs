@@ -107,7 +107,7 @@ grammar =
     _primitiveDefinition <-
       define
         "primitive-definition"
-        [ lit "primitive"
+        [ lit "prim"
         , ref typeName
         , Many $ ref name
         , lit "is"

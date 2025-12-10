@@ -490,7 +490,7 @@ docDocumented (Documented mDesc name params body) =
     <> Pretty.line
       ( ( case body of
             DocumentedType{} -> fromString "type"
-            DocumentedPrim{} -> fromString "primitive"
+            DocumentedPrim{} -> fromString "prim"
         )
           <> fromString " "
           <> fromString "<a id=\""

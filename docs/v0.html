@@ -42,9 +42,9 @@ type <a id="type-List" href="#type-List">List</a> a = {
   items : <a href="#prim-Vector">Vector</a> len a
 }
 
-primitive <a id="prim-Word64" href="#prim-Word64">Word64</a> is "an 8 byte natural number (big endian)"
+prim <a id="prim-Word64" href="#prim-Word64">Word64</a> is "an 8 byte natural number (big endian)"
 
-primitive <a id="prim-Vector" href="#prim-Vector">Vector</a> len a is "`len` consecutive `a`s"
+prim <a id="prim-Vector" href="#prim-Vector">Vector</a> len a is "`len` consecutive `a`s"
 
 type <a id="type-StateId" href="#type-StateId">StateId</a> = <a href="#type-MD5">MD5</a>
 
@@ -71,7 +71,7 @@ type <a id="type-GID" href="#type-GID">GID</a> = {
   4 : <a href="#prim-Word16">Word16</a>
 }
 
-primitive <a id="prim-Word16" href="#prim-Word16">Word16</a> is "a 2 byte natural number (big endian)"
+prim <a id="prim-Word16" href="#prim-Word16">Word16</a> is "a 2 byte natural number (big endian)"
 
 type <a id="type-Task" href="#type-Task">Task</a> = {
   status : <a href="#type-Map">Map</a> <a href="#type-StateId">StateId</a> <a href="#type-Utf8">Utf8</a>,
@@ -85,7 +85,7 @@ type <a id="type-Utf8" href="#type-Utf8">Utf8</a> = {
   bytes : <a href="#prim-Vector">Vector</a> length <a href="#prim-Word8">Word8</a>
 }
 
-primitive <a id="prim-Word8" href="#prim-Word8">Word8</a> is "a byte (big endian)"
+prim <a id="prim-Word8" href="#prim-Word8">Word8</a> is "a byte (big endian)"
 
 type <a id="type-TaskMetadata" href="#type-TaskMetadata">TaskMetadata</a> = {
   createdAt : <a href="#type-UTCTime">UTCTime</a>
