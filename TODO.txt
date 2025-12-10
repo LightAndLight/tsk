@@ -1,6 +1,6 @@
 * [ ] Update a task and leave a comment in a single "transaction"
 
-* [ ] Document binary format
+* [x] Document binary format
 
 * [x] `task new` without editing the file shouldn't create a task
 
