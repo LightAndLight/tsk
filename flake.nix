@@ -23,9 +23,13 @@
         };
 
         apps = {
-          type = "app";
-          program = "${packages.default}/bin/tsk";
-          meta.description = "A to-do list / task-tracking program";
+          default = {
+            type = "app";
+            program =
+              with pkgs.haskell.lib;
+              "${justStaticExecutables (dontHaddock packages.default)}/bin/tsk";
+            meta.description = "a to-do list / task-tracking program";
+          };
         };
       in {
         inherit apps packages;
