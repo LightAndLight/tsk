@@ -548,7 +548,7 @@ docDocumentedType (DocumentedChoice x ys) =
     `Pretty.extend` docDocumentedType x
     `Pretty.extend` ( case unsnoc
                         ( fmap
-                            (\(l, y) -> Pretty.line (renderDocumentedLit l ++ " -> ") `Pretty.extend` docDocumentedType y)
+                            (\(l, y) -> Pretty.line (renderDocumentedLit l ++ " => ") `Pretty.extend` docDocumentedType y)
                             ys
                         ) of
                         Nothing ->

@@ -108,8 +108,8 @@ type <a id="type-CommentMetadata" href="#type-CommentMetadata">CommentMetadata</
 type <a id="type-ReplyId" href="#type-ReplyId">ReplyId</a> = {
   tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -> <a href="#type-TaskId">TaskId</a>,
-    1 -> <a href="#type-CommentId">CommentId</a>
+    0 => <a href="#type-TaskId">TaskId</a>,
+    1 => <a href="#type-CommentId">CommentId</a>
   }
 }
 
@@ -121,13 +121,13 @@ type <a id="type-Commit" href="#type-Commit">Commit</a> = {
 type <a id="type-Change" href="#type-Change">Change</a> = {
   tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -> {
+    0 => {
       status : <a href="#type-Utf8">Utf8</a>,
       labels : <a href="#type-Set">Set</a> <a href="#type-Utf8">Utf8</a>,
       title : <a href="#type-Utf8">Utf8</a>,
       description : <a href="#type-Utf8">Utf8</a>
     },
-    1 -> {
+    1 => {
       taskId : <a href="#type-TaskId">TaskId</a>,
       updateTask : {
         status : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>,
@@ -136,13 +136,13 @@ type <a id="type-Change" href="#type-Change">Change</a> = {
         description : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>
       }
     },
-    2 -> {
+    2 => {
       replyTo : <a href="#type-ReplyId">ReplyId</a>,
       comment : {
         description : <a href="#type-Utf8">Utf8</a>
       }
     },
-    3 -> {
+    3 => {
       commentId : <a href="#type-CommentId">CommentId</a>,
       updateComment : {
         description : <a href="#type-Update">Update</a> <a href="#type-Utf8">Utf8</a>
@@ -154,9 +154,9 @@ type <a id="type-Change" href="#type-Change">Change</a> = {
 type <a id="type-Update" href="#type-Update">Update</a> a = {
   tag : <a href="#prim-Word64">Word64</a>,
   value : match tag {
-    0 -> {},
-    1 -> a,
-    2 -> <a href="#type-StateId">StateId</a>
+    0 => {},
+    1 => a,
+    2 => <a href="#type-StateId">StateId</a>
   }
 }
 
