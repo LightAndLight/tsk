@@ -6,7 +6,23 @@ tests: True
 
 source-repository-package
   type: git
+  location: https://github.com/LightAndLight/diagnostica.git
+  tag: 19a444226bb034cd3df0949fd7ce3b339d393786
+
+source-repository-package
+  type: git
+  location: https://github.com/LightAndLight/diagnostica-sage.git
+  tag: c366e1210818391d1c439c16df31fae39ae42878
+
+source-repository-package
+  type: git
   location: https://github.com/soenkehahn/generics-eot.git
   tag: 351f0c2e8d4586d294f803e906c06b8dcc7a0a14
+
+source-repository-package
+  type: git
+  location: https://github.com/LightAndLight/sage.git
+  tag: c449a0eb061e1b9826b692e425ee86b85f4607d5
+  subdir: sage
 
 --- END HDEPS ---

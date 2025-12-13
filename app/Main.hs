@@ -21,10 +21,12 @@ import Barbies
   , bzipWith
   )
 import Control.Applicative (Const (..), many, optional, some, (<**>), (<|>))
-import Control.Exception (finally)
-import Control.Monad (unless, when)
+import Control.Exception (finally, tryJust)
+import Control.Monad (guard, unless, when)
 import Data.Attoparsec.Combinator (lookAhead)
 import qualified Data.Attoparsec.Text.Lazy as Attoparsec
+import qualified Data.ByteString.Char8 as ByteString.Char8
+import qualified Data.ByteString.Lazy as LazyByteString
 import qualified Data.Char as Char
 import Data.Foldable (fold, foldl', foldlM, for_, traverse_)
 import Data.Functor (void)
@@ -58,10 +60,14 @@ import qualified Options.Applicative as Options
 import Options.Applicative.Help.Pretty ((.$.))
 import StateId (StateId (..), renderStateId)
 import System.Directory (copyFile, createDirectoryIfMissing, doesFileExist, removeFile)
+import System.Environment (getProgName)
 import qualified System.Environment
 import System.Exit (ExitCode (..), exitFailure)
-import System.IO (Handle, IOMode (..), hClose, hPutStr, withFile)
+import System.IO (Handle, IOMode (..), hClose, hPutStr, hPutStrLn, stderr, withFile)
+import System.IO.Error (isDoesNotExistError)
 import qualified System.Process as Process
+import qualified Text.Diagnostic as Diagnostic
+import qualified Text.Diagnostic.Sage as Diagnostic (parseError)
 import qualified Todo
   ( Change (..)
   , State (..)
@@ -96,10 +102,11 @@ import qualified Todo.Task as Todo
   )
 import qualified Todo.V0
 import qualified Todoist
+import qualified Toml
 import Prelude hiding (init)
 
 data Cli
-  = Cli {database :: FilePath, command :: Command}
+  = Cli {config :: FilePath, database :: Configured FilePath, command :: Command}
 
 data Command
   = Default
@@ -187,14 +194,43 @@ parseTaskListFilter input =
 data LabelCommand
   = LabelList
 
-cliParser :: Options.Parser Cli
-cliParser =
+type Env = [(String, String)]
+
+data Config
+  = Config
+  { configDatabase :: FilePath
+  }
+
+data Configured a
+  = UseConfig
+      -- | Key name
+      String
+      -- | Accessor function
+      (Config -> a)
+  | Provided a
+
+cliParser :: Env -> Options.Parser Cli
+cliParser env =
   Cli
     <$> Options.strOption
+      ( Options.long "config"
+          <> Options.metavar "PATH"
+          <> Options.help "Config file to use"
+          <> ( case lookup "XDG_CONFIG_HOME" env of
+                Just value -> Options.value $ value ++ "/tsk/config.toml"
+                Nothing -> Options.value "~/.config/tsk/config.toml"
+             )
+          <> Options.showDefaultWith
+            (const "$XDG_CONFIG_HOME/tsk/config.toml, otherwise ~/.config/tsk/config.toml")
+      )
+    <*> Options.option
+      (Provided <$> Options.str)
       ( Options.long "database"
           <> Options.short 'd'
           <> Options.metavar "PATH"
           <> Options.help "The database on which to operate"
+          <> Options.value (UseConfig "database" configDatabase)
+          <> Options.showDefaultWith (\case UseConfig key _f -> "config key: " ++ key; Provided a -> show a)
       )
     <*> ( Options.hsubparser
             ( Options.command
@@ -341,23 +377,86 @@ cliParser =
           (Todo.CommentId <$> Options.maybeReader gidFromBase32)
           (Options.metavar "ID" <> Options.help "Comment to edit")
 
+readConfig :: FilePath -> IO (Maybe Config)
+readConfig path = do
+  result <- tryJust (guard . isDoesNotExistError) $ Toml.readFile path configDecoder
+  case result of
+    Left () -> pure Nothing
+    Right (Left err) -> do
+      let
+        report =
+          case err of
+            Toml.TomlParseError parseError ->
+              Diagnostic.parseError parseError
+            Toml.MissingKey key ->
+              Diagnostic.emit
+                (Diagnostic.Offset 0)
+                Diagnostic.Caret
+                (fromString $ "missing key: " ++ Text.unpack key)
+            Toml.UnconsumedKeys keys ->
+              foldMap
+                ( \(Toml.Located loc key) ->
+                    Diagnostic.emit
+                      (Diagnostic.Offset loc)
+                      Diagnostic.Caret
+                      (fromString $ "unexpected key: " ++ Text.unpack key)
+                )
+                keys
+            Toml.ValueDecodeError (Toml.Located _loc key) (Toml.Located loc _value) ->
+              Diagnostic.emit
+                (Diagnostic.Offset loc)
+                Diagnostic.Caret
+                (fromString $ "invalid valid for key: " ++ Text.unpack key)
+      contents <- LazyByteString.readFile path
+      LazyByteString.hPutStr stderr $
+        Diagnostic.render Diagnostic.defaultConfig (ByteString.Char8.pack path) contents report
+      exitFailure
+    Right (Right a) ->
+      pure $ Just a
+  where
+    configDecoder =
+      Config
+        <$> Toml.key (fromString "database") (Text.unpack <$> Toml.string)
+
 main :: IO ()
 main = do
-  cli <- Options.execParser (Options.info (cliParser <**> Options.helper) Options.fullDesc)
+  env <- System.Environment.getEnvironment
+  cli <-
+    Options.execParser $
+      Options.info
+        (cliParser env <**> Options.helper)
+        Options.fullDesc
+
+  mConfig <- readConfig $ config cli
+  databasePath <-
+    case database cli of
+      Provided value -> pure value
+      UseConfig _key f ->
+        case mConfig of
+          Just config ->
+            pure $ f config
+          Nothing -> do
+            hPutStrLn stderr "error: no database provided\n"
+            programName <- getProgName
+            hPutStrLn stderr $
+              "Specify one using -d/--database or via a config file. See `"
+                ++ programName
+                ++ " --help` for details."
+            exitFailure
 
   case command cli of
-    Default -> default_ (database cli)
-    Init mFrom -> init (database cli) mFrom
-    Debug -> debug (database cli)
-    Merge other -> merge (database cli) other
-    Task TaskNew -> taskNew (database cli)
-    Task (TaskList mQuery) -> taskList (database cli) mQuery
-    Task (TaskView taskId) -> taskView (database cli) taskId
-    Task (TaskEdit taskId) -> taskEdit (database cli) taskId
-    Label LabelList -> labelList (database cli)
-    Comment (CommentNew replyId) -> commentNew (database cli) replyId
-    Comment CommentList -> commentList (database cli)
-    Comment (CommentView commentId) -> commentView (database cli) commentId
+    Default -> default_ databasePath
+    Init mFrom -> init databasePath mFrom
+    Debug -> debug databasePath
+    Merge other -> merge databasePath other
+    Task TaskNew -> taskNew databasePath
+    Task (TaskList mQuery) -> taskList databasePath mQuery
+    Task (TaskView taskId) -> taskView databasePath taskId
+    Task (TaskEdit taskId) -> taskEdit databasePath taskId
+    Label LabelList -> labelList databasePath
+    Comment (CommentNew replyId) -> commentNew databasePath replyId
+    Comment CommentList -> commentList databasePath
+    Comment (CommentView commentId) -> commentView databasePath commentId
 
 stateSerialise :: FilePath -> Todo.State -> IO ()
 stateSerialise = Todo.V0.stateSerialise
