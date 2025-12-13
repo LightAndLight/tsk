@@ -208,7 +208,11 @@ cliParser =
                   (Options.info debugParser (Options.progDesc "Debug a database" <> Options.fullDesc))
                 <> Options.command
                   "merge"
-                  (Options.info mergeParser (Options.progDesc "Combine two databases" <> Options.fullDesc))
+                  ( Options.info
+                      mergeParser
+                      ( Options.progDesc "Combine two databases" <> Options.fullDesc <> Options.footerDoc (Just mergeHeader)
+                      )
+                  )
                 <> Options.command
                   "task"
                   (Options.info (Task <$> taskParser) (Options.progDesc "Task operations" <> Options.fullDesc))
@@ -256,8 +260,12 @@ cliParser =
     debugParser =
       pure Debug
 
+    mergeHeader =
+      fromString
+        "Example: `tsk -d target merge other` merges the database `other` into the database `target`"
+
     mergeParser =
-      Merge <$> Options.strArgument (Options.metavar "PATH" <> Options.help "Database to be merged in")
+      Merge <$> Options.strArgument (Options.metavar "PATH" <> Options.help "Database to be merged")
 
     taskParser =
       Options.hsubparser
