@@ -26,11 +26,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1764304207,
-        "narHash": "sha256-/E14AzlV5RfkVR3nTqFKue6v3gnzCkdfFKgeuymwkKA=",
+        "lastModified": 1765585071,
+        "narHash": "sha256-xfmgF1NUMKbr5Bia//ztU0yZaSKlf379xZC5MWtrvlc=",
         "owner": "LightAndLight",
         "repo": "hdeps",
-        "rev": "8f56ec5c7e865ee0b91ce972e87a22193df59ade",
+        "rev": "132878c7ac2bfa749b962424e6001159cef20f7f",
         "type": "github"
       },
       "original": {
