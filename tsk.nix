@@ -1,7 +1,8 @@
 { mkDerivation, attoparsec, barbies, base, binary, bytestring
-, cassava, containers, cryptohash-md5, directory, dlist, entropy
-, generics-eot, hashable, hedgehog, hspec, hspec-hedgehog, lib, mtl
-, optparse-applicative, process, text, time, uuid
+, cassava, containers, cryptohash-md5, diagnostica
+, diagnostica-sage, directory, dlist, entropy, generics-eot
+, hashable, hedgehog, hspec, hspec-hedgehog, lib, mtl
+, optparse-applicative, process, sage, text, time, uuid
 }:
 mkDerivation {
   pname = "tsk";
@@ -11,11 +12,12 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     barbies base binary bytestring containers cryptohash-md5 directory
-    dlist entropy generics-eot hashable mtl text time uuid
+    dlist entropy generics-eot hashable mtl sage text time uuid
   ];
   executableHaskellDepends = [
-    attoparsec barbies base bytestring cassava containers directory mtl
-    optparse-applicative process text time
+    attoparsec barbies base bytestring cassava containers diagnostica
+    diagnostica-sage directory mtl optparse-applicative process text
+    time
   ];
   testHaskellDepends = [
     base containers hashable hedgehog hspec hspec-hedgehog uuid
