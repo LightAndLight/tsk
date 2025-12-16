@@ -8,18 +8,24 @@
   };
   outputs = { self, nixpkgs, flake-utils, hdeps }:
     flake-utils.lib.eachDefaultSystem (system:
-      let 
+      let
+        overlays = {
+          default = self: super: {
+            haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
+
+            tsk = self.haskell.lib.justStaticExecutables (self.haskellPackages.callPackage ./tsk.nix {});
+          };
+        };
+
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            (self: super: {
-              haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
-            })
+            overlays.default
           ];
         };
 
         packages = {
-          default = pkgs.haskellPackages.callPackage ./tsk.nix {};
+          default = pkgs.tsk;
         };
 
         apps = {
@@ -31,8 +37,12 @@
             meta.description = "a to-do list / task-tracking program";
           };
         };
+
+        nixosModules = {
+          default = import ./nix/home-manager.nix;
+        };
       in {
-        inherit apps packages;
+        inherit apps nixosModules overlays packages;
 
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
