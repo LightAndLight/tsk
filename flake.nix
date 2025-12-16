@@ -31,8 +31,12 @@
             meta.description = "a to-do list / task-tracking program";
           };
         };
+
+        nixosModules = {
+          default = import ./home-manager/tsk.nix;
+        };
       in {
-        inherit apps packages;
+        inherit apps nixosModules packages;
 
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
