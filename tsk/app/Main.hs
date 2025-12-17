@@ -217,11 +217,27 @@ cliParser env =
           <> Options.metavar "PATH"
           <> Options.help "Config file to use"
           <> ( case lookup "XDG_CONFIG_HOME" env of
-                Just value -> Options.value $ value ++ "/tsk/config.toml"
-                Nothing -> Options.value "~/.config/tsk/config.toml"
+                Just value ->
+                  Options.value $ value ++ "/tsk/config.toml"
+                Nothing ->
+                  case lookup "HOME" env of
+                    Just value ->
+                      Options.value $ value ++ "/.config/tsk/config.toml"
+                    Nothing ->
+                      {- If `XDG_CONFIG_HOME` and `HOME` are both unset, then `tsk task list` reports:
+
+                      ```
+                      Missing: --config PATH
+
+                      Usage: tsk --config PATH [-d|--database PATH] [COMMAND]
+                      ```
+
+                      It's an inaccurate error message due to playing by `optparse-applicative`'s rules.
+                      -}
+                      mempty
              )
           <> Options.showDefaultWith
-            (const "$XDG_CONFIG_HOME/tsk/config.toml, otherwise ~/.config/tsk/config.toml")
+            (const "$XDG_CONFIG_HOME/tsk/config.toml, otherwise $HOME/.config/tsk/config.toml")
       )
     <*> Options.option
       (Provided <$> Options.str)
@@ -436,10 +452,10 @@ main = do
           Just config ->
             pure $ f config
           Nothing -> do
-            hPutStrLn stderr "error: no database provided\n"
+            hPutStrLn stderr $ "error: no database provided (config not found: " ++ config cli ++ ")\n"
             programName <- getProgName
             hPutStrLn stderr $
-              "Specify one using -d/--database or via a config file. See `"
+              "Specify a database using -d/--database or via a config file. See `"
                 ++ programName
                 ++ " --help` for details."
             exitFailure
