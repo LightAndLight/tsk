@@ -1,5 +1,5 @@
 { fetchzip }:
 fetchzip {
-  url = "https://github.com/LightAndLight/diagnostica/archive/19a444226bb034cd3df0949fd7ce3b339d393786.tar.gz";
-  sha256 = "1qwzfk818618rld5yyr33dzvcxgl4q9pgp76qx42idpk4a8gmrdx";
+  url = "https://github.com/LightAndLight/diagnostica/archive/ae00004b101bde236abedba7ce480d289707356d.tar.gz";
+  sha256 = "0ijakqlgbclc4szkkil81n0rqqvdn1i1cxcdifsrnbqld4vw4a82";
 }

@@ -10,7 +10,7 @@ mkDerivation {
   libraryHaskellDepends = [
     ansi-terminal base bytestring containers text
   ];
-  executableHaskellDepends = [ base text ];
+  executableHaskellDepends = [ base bytestring ];
   testHaskellDepends = [ base bytestring hspec text ];
   description = "A library for building and rendering error diagnostics";
   license = lib.licenses.bsd3;
