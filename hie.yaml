@@ -1,16 +1,16 @@
 cradle:
   cabal:
-    - path: "./src"
+    - path: "./tsk/src"
       component: "lib:tsk"
 
-    - path: "./app/Main.hs"
+    - path: "./tsk/app/Main.hs"
       component: "tsk:exe:tsk"
 
-    - path: "./app/Todoist.hs"
+    - path: "./tsk/app/Todoist.hs"
       component: "tsk:exe:tsk"
 
-    - path: "./app/BinaryFormat.hs"
+    - path: "./tsk/app/BinaryFormat.hs"
       component: "tsk:exe:tsk-binary-format"
 
-    - path: "./test"
+    - path: "./tsk/test"
       component: "tsk:test:tsk-tests"

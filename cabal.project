@@ -1,4 +1,5 @@
-packages: .
+packages:
+  ./tsk
 
 tests: True
 

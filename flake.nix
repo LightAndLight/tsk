@@ -13,7 +13,7 @@
           default = self: super: {
             haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
 
-            tsk = self.haskell.lib.justStaticExecutables (self.haskellPackages.callPackage ./tsk.nix {});
+            tsk = self.haskell.lib.justStaticExecutables (self.haskellPackages.callPackage ./tsk/tsk.nix {});
           };
         };
 

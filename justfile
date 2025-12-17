@@ -21,4 +21,4 @@ gen-docs:
     rm -r docs.old
 
 cabal2nix:
-    cabal2nix . > tsk.nix
+    cabal2nix tsk > tsk/tsk.nix
