@@ -8,6 +8,7 @@ let
   ;
   toml = pkgs.formats.toml {};
   cfg = config.programs.tsk;
+  tskConfigPath = "${config.xdg.configHome}/tsk/config.toml";
 in
 {
   options.programs.tsk = {
@@ -31,7 +32,25 @@ in
   };
 
   config = {
-    home.file."${config.xdg.configHome}/tsk/config.toml".source = toml.generate "tsk-config.toml" cfg.config;
+    home.file."${tskConfigPath}".source = toml.generate "tsk-config.toml" cfg.config;
     home.packages = [ cfg.package ];
+
+    home.activation = {
+      tskInit = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        verboseEcho "database location: ${cfg.config.database}"
+        if [ ! -f ${cfg.config.database} ]; then
+          verboseEcho "creating database"
+
+          mkdir -p $(dirname ${cfg.config.database})
+          run ${cfg.package}/bin/tsk \
+            --config ${tskConfigPath} \
+            -d ${cfg.config.database} \
+            init \
+            $VERBOSE_ARG
+        else
+          verboseEcho "database already exists (skipping creation)"
+        fi
+      '';
+    };
   };
 }
