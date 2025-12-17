@@ -478,7 +478,13 @@ stateSerialise :: FilePath -> Todo.State -> IO ()
 stateSerialise = Todo.V0.stateSerialise
 
 stateDeserialise :: FilePath -> IO Todo.State
-stateDeserialise = Todo.V0.stateDeserialise
+stateDeserialise path = do
+  result <- tryJust (guard . isDoesNotExistError) $ Todo.V0.stateDeserialise path
+  case result of
+    Right a -> pure a
+    Left () -> do
+      hPutStrLn stderr $ "error: database not found: " ++ path
+      exitFailure
 
 stateSave :: FilePath -> Todo.State -> IO ()
 stateSave = Todo.V0.stateSave
