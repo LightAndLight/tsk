@@ -7,16 +7,18 @@
     };
   };
   outputs = { self, nixpkgs, flake-utils, hdeps }:
+    let
+      overlays.default =
+        self: super:
+        {
+          haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
+
+          tsk = self.haskell.lib.justStaticExecutables (self.haskellPackages.callPackage ./tsk/tsk.nix {});
+        };
+    in
+    { inherit overlays; } //
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = {
-          default = self: super: {
-            haskellPackages = super.haskellPackages.extend (import ./nix/haskellDeps/overlay.nix);
-
-            tsk = self.haskell.lib.justStaticExecutables (self.haskellPackages.callPackage ./tsk/tsk.nix {});
-          };
-        };
-
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
@@ -42,7 +44,7 @@
           default = import ./nix/home-manager.nix;
         };
       in {
-        inherit apps nixosModules overlays packages;
+        inherit apps nixosModules packages;
 
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
@@ -58,6 +60,8 @@
             hdeps.packages.${system}.default
 
             haskellPackages.mustache
+
+            zlib
           ];
 
           shellHook = ''
