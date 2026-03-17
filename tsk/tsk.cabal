@@ -16,7 +16,7 @@ library
     import:           warnings
     build-depends:
         barbies,
-        base ^>=4.19.2.0,
+        base >=4 && <5,
         binary,
         bytestring,
         containers,
@@ -57,7 +57,7 @@ executable tsk
         attoparsec,
         tsk,
         barbies,
-        base ^>=4.19.2.0,
+        base,
         bytestring,
         cassava,
         containers,
@@ -77,7 +77,7 @@ executable tsk-binary-format
     main-is:          BinaryFormat.hs
     build-depends:
         tsk,
-        base ^>=4.19.2.0,
+        base,
         mtl,
         optparse-applicative,
         text
@@ -91,7 +91,7 @@ test-suite tsk-tests
     main-is:          Main.hs
     build-depends:
         tsk,
-        base ^>=4.19.2.0,
+        base,
         containers,
         hashable,
         hedgehog,
